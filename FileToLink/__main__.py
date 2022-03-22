@@ -35,14 +35,14 @@ async def main(_, msg: Message):
         # If the file already exist on the server
         if not worker.parts[0]:
             # If first part of the file is not downloaded yet, send Generating link message
-            gen_msg = await bot.send_message(msg.chat.id, Strings.generating_link,
-                                             reply_to_message_id=msg.message_id)
+            gen_msg = None
+
         else:
             gen_msg = None
     else:
         # Else if the file not exist on the server, Send the message to Archive Channel and Create empty file
-        gen_msg = await bot.send_message(msg.chat.id, Strings.generating_link,
-                                         reply_to_message_id=msg.message_id)
+        gen_msg = None
+
 
         archived_msg = await archive_msg(msg)
         worker = Worker(archived_msg)
@@ -57,14 +57,14 @@ async def main(_, msg: Message):
 
     name = worker.name  # File Name
     dl_link = worker.link  # Download Link
-    text = f"[{name}]({dl_link})"
+    text = f"/rename {name}"
 
     buttons = [[InlineKeyboardButton(Strings.dl_link, url=dl_link)]]
     if worker.stream:
         st_link = f'{dl_link}?st=1'  # Stream Link
         buttons.append([InlineKeyboardButton(Strings.st_link, url=st_link)])
     buttons.append([InlineKeyboardButton(Strings.update_link, callback_data=f'fast|{worker.archive_id}')])
-    reply_markup = InlineKeyboardMarkup(buttons)
+    reply_markup = None
 
     if gen_msg is not None:
         await gen_msg.edit_text(text, reply_markup=reply_markup, disable_web_page_preview=True)
